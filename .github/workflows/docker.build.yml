@@ -2,6 +2,10 @@ name: Docker-Image-CI
 
 on: [push]
 
+env:
+  IMAGE_NAME: go-app-k8s
+
+
 jobs:
 
   build:
@@ -11,4 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag go-app-k8s:$(date +%s)
+      run: docker build . --file Dockerfile --tag IMAGE_NAME:latest
+
+    - name: Log into registry
+      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login hub.docker.com -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+
+    - name: Push image
+      run: |
+        IMAGE_ID=${{ secrets.DOCKERHUB_USER }}/$IMAGE_NAME
+        docker push $IMAGE_ID:latest
