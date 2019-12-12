@@ -23,5 +23,6 @@ jobs:
 
     - name: Push image
       run: |
+        REV_TAG=$(git log -1 --pretty=format:%h)
         IMAGE_ID=qwertmax/$IMAGE_NAME
         docker push $IMAGE_ID:$REV_TAG
