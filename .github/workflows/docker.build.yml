@@ -23,5 +23,5 @@ jobs:
 
     - name: Push image
       run: |
-        IMAGE_ID=qwertmax/$IMAGE_NAME
-        docker push $IMAGE_ID:$REV_TAG
+      IMAGE_ID=qwertmax/$IMAGE_NAME
+      docker push $IMAGE_ID:$REV_TAG
