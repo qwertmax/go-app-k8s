@@ -7,4 +7,6 @@ COPY main.go .
 
 RUN go build -o app .
 
+CMD ["./app"]
+
 EXPOSE 80
