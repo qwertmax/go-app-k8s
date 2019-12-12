@@ -6,6 +6,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"runtime"
+	"time"
 )
 
 // Info about current machine
@@ -74,6 +76,27 @@ func main() {
 	})
 	http.HandleFunc("/crash", func(w http.ResponseWriter, r *http.Request) {
 		os.Exit(3)
+	})
+
+	http.HandleFunc("/load", func(w http.ResponseWriter, r *http.Request) {
+		done := make(chan int)
+
+		for i := 0; i < runtime.NumCPU(); i++ {
+			go func() {
+				for {
+					select {
+					case <-done:
+						return
+					default:
+					}
+				}
+			}()
+		}
+
+		time.Sleep(time.Second * 10)
+		close(done)
+
+		write(w, "done")
 	})
 
 	http.ListenAndServe(":80", nil)
