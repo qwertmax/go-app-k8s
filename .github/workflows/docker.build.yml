@@ -4,8 +4,6 @@ on: [push]
 
 env:
   IMAGE_NAME: go-app-k8s
-  IMAGE_ID: ${{ secrets.DOCKERHUB_USER }}/$IMAGE_NAME
-
 
 jobs:
 
@@ -16,11 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag $IMAGE_ID
+      run: docker build . --file Dockerfile --tag qwertmax/$IMAGE_NAME
 
     - name: Log into registry
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
 
     - name: Push image
       run: |
+        IMAGE_ID=qwertmax/$IMAGE_NAME
         docker push $IMAGE_ID:latest
