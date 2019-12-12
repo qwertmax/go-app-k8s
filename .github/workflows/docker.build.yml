@@ -18,11 +18,10 @@ jobs:
 
     - name: Build the Docker image
       run: |
-      REV_TAG=$(git log -1 --pretty=format:%h)
-      docker build . --file Dockerfile --tag qwertmax/$IMAGE_NAME:$REV_TAG
+        REV_TAG=$(git log -1 --pretty=format:%h)
+        docker build . --file Dockerfile --tag qwertmax/$IMAGE_NAME:$REV_TAG
 
     - name: Push image
       run: |
-      REV_TAG=$(git log -1 --pretty=format:%h)
-      IMAGE_ID=qwertmax/$IMAGE_NAME
-      docker push $IMAGE_ID:$REV_TAG
+        IMAGE_ID=qwertmax/$IMAGE_NAME
+        docker push $IMAGE_ID:$REV_TAG
