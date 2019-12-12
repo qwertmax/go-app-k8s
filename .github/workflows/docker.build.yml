@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag IMAGE_NAME:latest
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
     - name: Log into registry
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login hub.docker.com -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
