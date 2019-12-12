@@ -72,5 +72,9 @@ func main() {
 			Name: name,
 		})
 	})
+	http.HandleFunc("/crash", func(w http.ResponseWriter, r *http.Request) {
+		os.Exit(3)
+	})
+
 	http.ListenAndServe(":80", nil)
 }
