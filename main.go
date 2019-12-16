@@ -75,6 +75,7 @@ func main() {
 		})
 	})
 	http.HandleFunc("/crash", func(w http.ResponseWriter, r *http.Request) {
+		write(w, "exited")
 		os.Exit(3)
 	})
 
