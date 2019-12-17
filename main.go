@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/user"
 	"runtime"
 	"time"
 )
@@ -14,6 +15,7 @@ import (
 type Info struct {
 	IP   string `json:"ip"`
 	Name string `json:"name"`
+	User string `json:"user"`
 }
 
 func getIP() (string, error) {
@@ -45,6 +47,11 @@ func getHostname() (string, error) {
 	return os.Hostname()
 }
 
+func getUser() (string, error) {
+	user, err := user.Current()
+	return user.Username, err
+}
+
 func write(w http.ResponseWriter, body interface{}) error {
 	js, err := json.Marshal(body)
 	if err != nil {
@@ -69,9 +76,16 @@ func main() {
 			return
 		}
 
+		userName, err := getUser()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		write(w, Info{
 			IP:   ip,
 			Name: name,
+			User: userName,
 		})
 	})
 	http.HandleFunc("/crash", func(w http.ResponseWriter, r *http.Request) {
