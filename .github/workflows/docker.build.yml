@@ -3,7 +3,11 @@ name: Docker-Image-CI
 on: [push]
 
 env:
-  IMAGE_NAME: go-app-k8s
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DEPLOY_KEY: ${{ secrets.SSH_KEY }}
+  USERNAME: qwertmax
+  IMAGE: go-app-k8s
+  CI: true
 
 jobs:
 
@@ -12,17 +16,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: bump new version
+      run: |
+        git fetch --all --tags
+        version=$(git describe --tags --abbrev=0)
+        echo "version: $version"
+        docker run --rm alpine/semver semver -c -i patch $version > VERSION
+        version=$(cat VERSION)
+        git config --global user.email "qwertmax@gmail.com"
+        git config --global user.name "Maxim Tishchento"
+        git tag -a "$version" -m "version $version"
+        git push --tags
+
+
     - name: Log into registry
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
 
-    - name: Build the Docker image
+    - name: build
       run: |
-        REV_TAG=$(git log -1 --pretty=format:%h)
-        docker build . --file Dockerfile --tag qwertmax/$IMAGE_NAME:$REV_TAG
+        version=$(cat VERSION)
+        docker build -t $USERNAME/$IMAGE . 
+        docker tag $USERNAME/$IMAGE:latest $USERNAME/$IMAGE:$version
 
-    - name: Push image
+    - name: deploy
       run: |
-        REV_TAG=$(git log -1 --pretty=format:%h)
-        IMAGE_ID=qwertmax/$IMAGE_NAME
-        docker push $IMAGE_ID:$REV_TAG
+        version=$(cat VERSION)
+        docker push $USERNAME/$IMAGE:latest
+        docker push $USERNAME/$IMAGE:$version
