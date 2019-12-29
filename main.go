@@ -92,7 +92,6 @@ func main() {
 		write(w, "exited")
 		os.Exit(3)
 	})
-
 	http.HandleFunc("/load", func(w http.ResponseWriter, r *http.Request) {
 		done := make(chan int)
 
@@ -114,5 +113,9 @@ func main() {
 		write(w, "done")
 	})
 
-	http.ListenAndServe(":80", nil)
+	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		port = "80"
+	}
+	http.ListenAndServe(":"+port, nil)
 }
