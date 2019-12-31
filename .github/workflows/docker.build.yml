@@ -39,7 +39,7 @@ jobs:
     - name: build
       run: |
         version=$(cat VERSION)
-        docker build -t $USERNAME/$IMAGE --build-arg VERSION=$(version) .
+        docker build -t $USERNAME/$IMAGE --build-arg VERSION=$(cat VERSION) .
         docker tag $USERNAME/$IMAGE:latest $USERNAME/$IMAGE:$version
 
     - name: deploy
