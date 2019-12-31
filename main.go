@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -90,6 +91,7 @@ func main() {
 	})
 	http.HandleFunc("/crash", func(w http.ResponseWriter, r *http.Request) {
 		write(w, "exited")
+		log.Fatal("crash")
 		os.Exit(3)
 	})
 	http.HandleFunc("/load", func(w http.ResponseWriter, r *http.Request) {
@@ -117,5 +119,8 @@ func main() {
 	if len(port) == 0 {
 		port = "80"
 	}
-	http.ListenAndServe(":"+port, nil)
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
