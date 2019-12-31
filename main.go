@@ -14,9 +14,10 @@ import (
 
 // Info about current machine
 type Info struct {
-	IP   string `json:"ip"`
-	Name string `json:"name"`
-	User string `json:"user"`
+	IP      string `json:"ip"`
+	Name    string `json:"name"`
+	User    string `json:"user"`
+	Version string `json:"version"`
 }
 
 func getIP() (string, error) {
@@ -53,6 +54,14 @@ func getUser() (string, error) {
 	return user.Username, err
 }
 
+func getVersion() string {
+	version := os.Getenv("VERSION")
+	if len(version) == 0 {
+		return "0"
+	}
+	return version
+}
+
 func write(w http.ResponseWriter, body interface{}) error {
 	js, err := json.Marshal(body)
 	if err != nil {
@@ -84,9 +93,10 @@ func main() {
 		}
 
 		write(w, Info{
-			IP:   ip,
-			Name: name,
-			User: userName,
+			IP:      ip,
+			Name:    name,
+			User:    userName,
+			Version: getVersion(),
 		})
 	})
 	http.HandleFunc("/crash", func(w http.ResponseWriter, r *http.Request) {
