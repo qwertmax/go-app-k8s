@@ -125,6 +125,10 @@ func main() {
 		write(w, "done")
 	})
 
+	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		write(w, "test")
+	})
+
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "80"
