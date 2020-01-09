@@ -1,9 +1,9 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -81,6 +81,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = createUserTable(db.DB)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ip, err := getIP()
@@ -136,8 +140,28 @@ func main() {
 		write(w, "test")
 	})
 	http.HandleFunc("/db", func(w http.ResponseWriter, r *http.Request) {
-		err := db.DB.Ping()
-		write(w, fmt.Sprintf("%s", err))
+		rows, err := db.DB.Query("SELECT id, name, email FROM users")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		type user struct {
+			ID    int    `json:"id"`
+			Name  string `json:"name"`
+			Email string `json:"email"`
+		}
+		users := []user{}
+		for rows.Next() {
+			var id int
+			var name, email string
+			rows.Scan(&id, &name, &email)
+			users = append(users, user{
+				ID:    id,
+				Name:  name,
+				Email: email,
+			})
+		}
+		write(w, users)
 	})
 
 	port := os.Getenv("PORT")
@@ -148,4 +172,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func createUserTable(db *sql.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS users (
+		id SERIAL PRIMARY KEY,
+		name character varying(256),
+		email character varying(256)
+	);`)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	_, err = db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS users_pkey ON users(id int4_ops);")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	return nil
 }
