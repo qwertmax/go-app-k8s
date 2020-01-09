@@ -3,7 +3,7 @@ LABEL maintainer="qwertmax@gmail.com"
 
 WORKDIR /app
 COPY . .
-RUN go get ./...
+RUN ["./setup.sh"]
 RUN go build -o app .
 ARG VERSION
 ENV VERSION=$VERSION
