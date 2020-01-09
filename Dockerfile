@@ -2,7 +2,7 @@ FROM golang:latest
 LABEL maintainer="qwertmax@gmail.com"
 
 WORKDIR /app
-COPY main.go db.go .
+COPY . .
 RUN go get ./...
 RUN go build -o app .
 ARG VERSION
