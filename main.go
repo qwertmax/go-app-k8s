@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -131,9 +132,12 @@ func main() {
 
 		write(w, "done")
 	})
-
 	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		write(w, "test")
+	})
+	http.HandleFunc("/db", func(w http.ResponseWriter, r *http.Request) {
+		err := db.DB.Ping()
+		write(w, fmt.Sprintf("%s", err))
 	})
 
 	port := os.Getenv("PORT")
