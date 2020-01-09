@@ -74,6 +74,13 @@ func write(w http.ResponseWriter, body interface{}) error {
 }
 
 func main() {
+	db := Storage{}
+	// err := db.Connect("postgres", "1", "localhost", "5432", "gotest", "disable")
+	err := db.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ip, err := getIP()
 		if err != nil {
@@ -133,7 +140,7 @@ func main() {
 	if len(port) == 0 {
 		port = "80"
 	}
-	err := http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
