@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -139,7 +141,7 @@ func main() {
 	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		write(w, "test")
 	})
-	http.HandleFunc("/db", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.DB.Query("SELECT id, name, email FROM users")
 		if err != nil {
 			log.Fatal(err)
@@ -162,6 +164,27 @@ func main() {
 			})
 		}
 		write(w, users)
+	})
+	http.HandleFunc("/user/create", func(w http.ResponseWriter, r *http.Request) {
+		type User struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+		}
+		var user User
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		json.Unmarshal(body, &user)
+
+		sql := fmt.Sprintf("INSERT INTO users (name, email) VALUES ('%s', '%s')", user.Name, user.Email)
+		log.Printf(sql)
+		_, err = db.DB.Exec(sql)
+		if err != nil {
+			log.Fatal(err)
+		}
+		write(w, "ok")
 	})
 
 	port := os.Getenv("PORT")
