@@ -13,6 +13,8 @@ import (
 	"os/user"
 	"runtime"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Info about current machine
@@ -186,6 +188,9 @@ func main() {
 		}
 		write(w, "ok")
 	})
+	http.HandleFunc("/logs", func(w http.ResponseWriter, r *http.Request) {
+	})
+	http.Handle("/metrics", promhttp.Handler())
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
