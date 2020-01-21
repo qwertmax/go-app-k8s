@@ -90,10 +90,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	max_metric := prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "max_metric",
+	maxim := prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "maxim",
 		Help: "Maxim metric",
 	})
+	prometheus.Register(maxim)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ip, err := getIP()
@@ -192,7 +193,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		max_metric.Inc()
+		maxim.Inc()
 		write(w, "ok")
 	})
 	http.HandleFunc("/logs", func(w http.ResponseWriter, r *http.Request) {
