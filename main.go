@@ -91,8 +91,9 @@ func main() {
 	}
 
 	maxim := prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "maxim",
-		Help: "Maxim metric",
+		Name:        "user_create",
+		Help:        "Maxim metric",
+		ConstLabels: prometheus.Labels{"code": "200", "method": "POST"},
 	})
 	prometheus.Register(maxim)
 
