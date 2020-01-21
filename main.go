@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -80,7 +81,6 @@ func write(w http.ResponseWriter, body interface{}) error {
 
 func main() {
 	db := Storage{}
-	// err := db.Connect("postgres", "1", "localhost", "5432", "gotest", "disable")
 	err := db.Init()
 	if err != nil {
 		log.Fatal(err)
@@ -89,6 +89,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	max_metric := prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "max_metric",
+		Help: "Maxim metric",
+	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ip, err := getIP()
@@ -186,6 +191,8 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		max_metric.Inc()
 		write(w, "ok")
 	})
 	http.HandleFunc("/logs", func(w http.ResponseWriter, r *http.Request) {
